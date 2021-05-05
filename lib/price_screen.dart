@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String dropDownValue = 'USD';
 
-  List<DropdownMenuItem> getDropDownList() {
+  DropdownButton<String> androidDropDown() {
     List<DropdownMenuItem<String>> dropDownItems = [];
     for (String currencie in currenciesList) {
       var newItem = DropdownMenuItem(
@@ -19,16 +20,43 @@ class _PriceScreenState extends State<PriceScreen> {
       );
       dropDownItems.add(newItem);
     }
-    return dropDownItems;
+    return DropdownButton(
+      value: dropDownValue,
+      items: dropDownItems,
+      onChanged: (selectedValue) {
+        setState(() {
+          dropDownValue = selectedValue;
+        });
+      },
+    );
   }
 
-  List<Widget> getPickerItems() {
+  CupertinoPicker iOSPicker() {
     List<Widget> pickerItems = [];
     for (String currencie in currenciesList) {
       Widget newPickerItem = Text(currencie);
       pickerItems.add(newPickerItem);
     }
-    return pickerItems;
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedIndex) {
+        setState(() {
+          dropDownValue = selectedIndex.toString();
+        });
+      },
+      children: pickerItems,
+    );
+  }
+
+  Widget getPicker() {
+    if (Platform.isAndroid) {
+      return androidDropDown();
+    } else if (Platform.isIOS) {
+      return iOSPicker();
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -68,16 +96,7 @@ class _PriceScreenState extends State<PriceScreen> {
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             child: Center(
-              child: CupertinoPicker(
-                itemExtent: 32.0,
-                onSelectedItemChanged: (selectedIndex) {
-                  setState(() {
-                    dropDownValue = selectedIndex.toString();
-                    print(selectedIndex);
-                  });
-                },
-                children: getPickerItems(),
-              ),
+              child: Platform.isIOS ? iOSPicker() : androidDropDown(),
             ),
           ),
         ],
