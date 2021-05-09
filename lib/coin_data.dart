@@ -38,16 +38,21 @@ const bitcoinAverageUrl =
 
 class CoinData {
   Future getCoinData(String selectedCurrency) async {
-    String url = '$coinApiUrl/BTC/$selectedCurrency?apikey=$apiKey';
-    http.Response response = await http.get(url);
+    Map<String, String> cryptoPrices = {};
 
-    if (response.statusCode == 200) {
-      var decodedData = jsonDecode(response.body);
-      var lastPrice = decodedData['rate'];
-      return lastPrice.toStringAsFixed(0);
-    } else {
-      print(response.statusCode);
-      throw ('Problem sa pribavljanjem podataka.');
+    for (String crypto in cryptoList) {
+      String url = '$coinApiUrl/$crypto/$selectedCurrency?apikey=$apiKey';
+      http.Response response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+        var lastPrice = decodedData['rate'];
+        cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
+      } else {
+        print(response.statusCode);
+        throw ('Problem sa pribavljanjem podataka.');
+      }
     }
+    return cryptoPrices;
   }
 }
