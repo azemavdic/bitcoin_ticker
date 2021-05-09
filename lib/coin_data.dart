@@ -33,16 +33,18 @@ const List<String> cryptoList = [
 
 const apiKey = 'B0EABEE0-CE43-424E-87C5-3695D6A350F1';
 const coinApiUrl = 'https://rest.coinapi.io/v1/exchangerate';
+const bitcoinAverageUrl =
+    'https://apiv2.bitcoinaverage.com/indices/global/ticker';
 
 class CoinData {
-  Future getCoinData() async {
-    String url = '$coinApiUrl/BTC/USD?apikey=$apiKey';
+  Future getCoinData(String selectedCurrency) async {
+    String url = '$coinApiUrl/BTC/$selectedCurrency?apikey=$apiKey';
     http.Response response = await http.get(url);
 
     if (response.statusCode == 200) {
       var decodedData = jsonDecode(response.body);
-      var rate = decodedData['rate'];
-      return rate;
+      var lastPrice = decodedData['rate'];
+      return lastPrice.toStringAsFixed(0);
     } else {
       print(response.statusCode);
       throw ('Problem sa pribavljanjem podataka.');
